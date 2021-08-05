@@ -51,8 +51,8 @@ def gen_variable_summary(var_name, var_struct):
             if query_ids and is_from_direct_datasource:
                 query_ids_filter = Filter([Predicate("query_id", "IN", query_ids)])
                 query = Query()
-                query.append(Table(f'{var_struct.store.db_schema_prefix}"{table}"', 'x'))
-                query.append(Join(f'{var_struct.store.db_schema_prefix}"__queries"', "id", "=", "sco_id", name_alias="y"))
+                query.append(Table(table,prefix=var_struct.store.db_schema_prefix))
+                query.append(Join('__queries', "id", "=", "sco_id",prefix=var_struct.store.db_schema_prefix))
                 query.append(query_ids_filter)
                 query.append(Count())
                 result = var_struct.store.run_query(query).fetchall()
@@ -73,8 +73,8 @@ def _get_variable_query_ids(variable):
     query_ids = []
     if variable.entity_table:
         query = Query()
-        query.append(Table(f'{variable.store.db_schema_prefix}"__queries"',"z"))
-        query.append(Join(f'{variable.store.db_schema_prefix}"{variable.entity_table}"', "sco_id", "=", "id", name_alias="y"))
+        query.append(Table("__queries",prefix=variable.store.db_schema_prefix))
+        query.append(Join(variable.entity_table, "sco_id", "=", "id", prefix=variable.store.db_schema_prefix))
         query.append(Projection(["query_id"]))
         query.append(Unique())
         try:
@@ -89,7 +89,7 @@ def get_variable_entity_count(variable):
     entity_count = 0
     if variable.entity_table:
         query = Query()
-        query.append(Table(f'{variable.store.db_schema_prefix}"{variable.entity_table}"'))
+        query.append(Table(variable.entity_table,prefix=variable.store.db_schema_prefix))
         entity_id_attr = get_entity_id_attribute(variable)
         query.append(Projection([entity_id_attr]))
         query.append(Unique())

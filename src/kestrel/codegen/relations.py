@@ -123,7 +123,7 @@ def get_entity_id_attribute(variable):
         for attr in stix_2_0_identical_mapping[variable.type]:
             if attr in available_attributes:
                 query = Query()
-                query.append(Table(f'{variable.store.db_schema_prefix}"{variable.entity_table}"'))
+                query.append(Table(variable.entity_table,prefix=variable.store.db_schema_prefix))
                 query.append(Projection([attr]))
                 query.append(Unique())
                 rows = variable.store.run_query(query).fetchall()
@@ -234,7 +234,7 @@ def fine_grained_relational_process_filtering(
     )
 
     query_ref = Query()
-    query_ref.append(Table(f'{variable.store.db_schema_prefix}"{local_var.entity_table}"'))
+    query_ref.append(Table(local_var.entity_table,prefix={variable.store.db_schema_prefix}))
     query_ref.append(Projection(["pid", "name", "first_observed", "last_observed"]))
     ref_rows = local_var.store.run_query(query_ref).fetchall()
 
@@ -250,7 +250,7 @@ def fine_grained_relational_process_filtering(
             )
 
     query_fil = Query()
-    query_fil.append(Table(f'{variable.store.db_schema_prefix}"{prefetch_entity_table}"'))
+    query_fil.append(Table(prefetch_entity_table,prefix=variable.store.db_schema_prefix))
     query_fil.append(
         Projection(["id", "pid", "name", "first_observed", "last_observed"])
     )
